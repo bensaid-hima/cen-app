@@ -28,7 +28,11 @@ export default function ArticleDetailScreen({ route }: any) {
           <ArticleMeta title={article.title} author={author} date={date} />
           <ArticleContent description={article.description} author={author} />
         </ScrollView>
-        <BottomStatBar onOpenComments={() => setShowComments(true)} />
+        <BottomStatBar
+          article={article}
+          onOpenComments={() => setShowComments(true)}
+        />
+
         <CommentModal visible={showComments} onClose={() => setShowComments(false)} />
       </View>
     </GestureHandlerRootView>

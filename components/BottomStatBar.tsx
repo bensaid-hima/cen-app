@@ -1,9 +1,35 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons, FontAwesome } from '@expo/vector-icons'
+import { saveArticle, removeArticle, isArticleSaved } from '../storage/savedArticles'
 
-export default function BottomStatBar({ onOpenComments }: { onOpenComments: () => void }) {
+export default function BottomStatBar({
+  article,
+  onOpenComments,
+}: {
+  article: any
+  onOpenComments: () => void
+}) {
   const [liked, setLiked] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    checkIfSaved()
+  }, [])
+
+  const checkIfSaved = async () => {
+    const alreadySaved = await isArticleSaved(article.url)
+    setSaved(alreadySaved)
+  }
+
+  const handleToggleSave = async () => {
+    if (saved) {
+      await removeArticle(article.url)
+    } else {
+      await saveArticle({ ...article, savedAt: Date.now() })
+    }
+    setSaved(!saved)
+  }
 
   return (
     <View style={styles.container}>
@@ -16,10 +42,10 @@ export default function BottomStatBar({ onOpenComments }: { onOpenComments: () =
         <Text style={styles.statText}>{liked ? '1.2k' : '1.1k'}</Text>
       </TouchableOpacity>
 
-      <View style={styles.statItem}>
-        <FontAwesome name="bookmark-o" size={20} color="#111" />
-        <Text style={styles.statText}>330</Text>
-      </View>
+      <TouchableOpacity style={styles.statItem} onPress={handleToggleSave}>
+        <FontAwesome name={saved ? 'bookmark' : 'bookmark-o'} size={20} color="#111" />
+        <Text style={styles.statText}>{saved ? 'Saved' : 'Save'}</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.statItem} onPress={onOpenComments}>
         <Ionicons name="chatbubble-outline" size={20} color="#111" />

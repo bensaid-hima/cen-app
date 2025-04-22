@@ -1,60 +1,101 @@
-import React from 'react'
-import { View, Text, StyleSheet, ImageBackground, Dimensions } from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient'
+import { View, Text, StyleSheet, ImageBackground, Dimensions, Animated, Platform } from "react-native"
+import { LinearGradient } from "expo-linear-gradient"
+import { BlurView } from "expo-blur"
 
-const screenWidth = Dimensions.get('window').width
+const screenWidth = Dimensions.get("window").width
+const HEADER_HEIGHT = Platform.OS === "ios" ? 90 : 80
 
-export default function HeroImage({ imageUrl, tag }: { imageUrl: string, tag: string }) {
+interface HeroImageProps {
+  imageUrl: string
+  tag: string
+  scrollY: Animated.Value
+}
+
+export default function HeroImage({ imageUrl, tag, scrollY }: HeroImageProps) {
+  // Parallax effect for the image
+  const imageTranslateY = scrollY.interpolate({
+    inputRange: [-300, 0, 300],
+    outputRange: [50, 0, -50],
+    extrapolate: "clamp",
+  })
+
+  // Scale effect for the image
+  const imageScale = scrollY.interpolate({
+    inputRange: [-300, 0, 300],
+    outputRange: [1.2, 1, 0.9],
+    extrapolate: "clamp",
+  })
+
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={{ uri: imageUrl }}
-        style={styles.image}
-        imageStyle={styles.imageRounded}
+      <Animated.View
+        style={[
+          styles.imageContainer,
+          {
+            transform: [{ translateY: imageTranslateY }, { scale: imageScale }],
+          },
+        ]}
       >
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.4)']}
-          style={styles.gradient}
-        />
-        <View style={styles.tag}>
-          <Text style={styles.tagText}>{tag}</Text>
-        </View>
-      </ImageBackground>
+        <ImageBackground
+          source={{ uri: imageUrl || "https://via.placeholder.com/800x500?text=No+Image" }}
+          style={styles.image}
+          imageStyle={styles.imageRounded}
+        >
+          <LinearGradient colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.6)"]} style={styles.gradient} />
+
+          <View style={styles.tagContainer}>
+            <BlurView intensity={80} tint="dark" style={styles.blurView}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </BlurView>
+          </View>
+        </ImageBackground>
+      </Animated.View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
+    height: 280,
+    marginTop: HEADER_HEIGHT,
+    overflow: "hidden",
+  },
+  imageContainer: {
+    height: 280,
+    width: screenWidth,
   },
   image: {
-    width: screenWidth - 32,
-    height: 220,
-    justifyContent: 'flex-end',
+    width: "100%",
+    height: "100%",
+    justifyContent: "flex-end",
   },
   imageRounded: {
-    borderRadius: 16,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
-  tag: {
-    backgroundColor: '#B40000',
-    alignSelf: 'flex-end',
-    marginBottom: 12,
-    marginRight: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+  tagContainer: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    overflow: "hidden",
     borderRadius: 20,
-    position: 'absolute',
-    top: 12,
-    right: 12,
+  },
+  blurView: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    overflow: "hidden",
   },
   tagText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
 })

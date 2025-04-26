@@ -1,222 +1,134 @@
-import { View, Text, StyleSheet, Image, Platform } from "react-native"
-import { FontAwesome5, Feather } from "@expo/vector-icons"
+"use client"
+
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Linking } from "react-native"
+import { Feather } from "@expo/vector-icons"
 
 interface ArticleContentProps {
   description: string
   content: string
   author: string
+  url?: string
 }
 
-export default function ArticleContent({ description, content, author }: ArticleContentProps) {
+export default function ArticleContent({ description, content, author, url }: ArticleContentProps) {
+  // Generate paragraphs from content
   const generateParagraphs = () => {
+    // If no content, use description
     if (!content) return [description]
-    const clean = content.replace(/\[.*?\]/g, "")
-    return clean.split("\n").filter((p) => p.trim().length > 0)
+
+    // Split content into paragraphs
+    const contentText = content.replace(/\[.*?\]/g, "") // Remove [+123 chars]
+    return contentText.split("\n").filter((p) => p.trim().length > 0)
   }
 
   const paragraphs = generateParagraphs()
-  const firstLetter = paragraphs[0]?.charAt(0) || ""
-  const restOfFirstParagraph = paragraphs[0]?.substring(1) || ""
+
+  const handleReadMore = () => {
+    if (url) {
+      Linking.openURL(url)
+    }
+  }
 
   return (
     <View style={styles.container}>
-      {/* Drop Cap Paragraph */}
-      <View style={styles.dropCapRow}>
-        <Text style={styles.dropCap}>{firstLetter}</Text>
-        <Text style={styles.firstParagraph}>{restOfFirstParagraph}</Text>
-      </View>
+      {/* Description as a lead paragraph */}
+      <Text style={styles.leadParagraph}>{description}</Text>
 
-      {/* Featured Image */}
-      <View style={styles.imageWrap}>
-        <Image
-          source={{ uri: "https://via.placeholder.com/800x400?text=Education+Innovation" }}
-          style={styles.image}
-        />
-        <Text style={styles.caption}>Education innovation is transforming classrooms worldwide</Text>
-      </View>
+      <View style={styles.divider} />
 
-      {/* Remaining Paragraphs */}
-      {paragraphs.slice(1).map((para, index) => (
-        <Text key={index} style={styles.paragraph}>{para}</Text>
+      {/* Content paragraphs */}
+      {paragraphs.map((paragraph, index) => (
+        <Text key={index} style={styles.paragraph}>
+          {paragraph}
+        </Text>
       ))}
 
-      {/* Pull Quote */}
-      <View style={styles.quoteBox}>
-        <FontAwesome5 name="quote-left" size={18} color="#B40000" />
-        <Text style={styles.quote}>
-          Their ideas are not only changing how we teach, but how we think about learning itself.
-        </Text>
-      </View>
-
-      <Text style={styles.paragraph}>
-        Young minds around the world are now leading transformative efforts in education, helping institutions embrace digital-first, inclusive methods of instruction.
-      </Text>
-
-      {/* Key Points */}
-      <View style={styles.keyPoints}>
-        <Text style={styles.keyPointsTitle}>Key Takeaways</Text>
-        {[
-          "Education technology continues to evolve rapidly",
-          "Personalized learning approaches show promising results",
-          "Educators need ongoing support to implement new methods",
-        ].map((point, i) => (
-          <View key={i} style={styles.keyPoint}>
-            <View style={styles.bullet}>
-              <Feather name="check" size={14} color="#fff" />
-            </View>
-            <Text style={styles.keyPointText}>{point}</Text>
+      {/* Truncated content indicator */}
+      {content && content.includes("[") && (
+        <View style={styles.truncatedContainer}>
+          <View style={styles.truncatedHeader}>
+            <Feather name="alert-circle" size={18} color="#555" />
+            <Text style={styles.truncatedTitle}>Content Preview</Text>
           </View>
-        ))}
-      </View>
-
-      {/* Author */}
-      <View style={styles.authorBox}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarInitial}>{author.charAt(0)}</Text>
+          <Text style={styles.truncatedText}>
+            This is a preview of the article. Continue reading on the publisher's website for the full content.
+          </Text>
+          {url && (
+            <TouchableOpacity style={styles.readMoreButton} onPress={handleReadMore}>
+              <Text style={styles.readMoreText}>Continue Reading</Text>
+              <Feather name="arrow-right" size={16} color="#fff" style={styles.readMoreIcon} />
+            </TouchableOpacity>
+          )}
         </View>
-        <View style={styles.authorMeta}>
-          <Text style={styles.authorName}>{author}</Text>
-          <Text style={styles.authorRole}>Passionate about learning & the future of education</Text>
-        </View>
-      </View>
+      )}
     </View>
   )
 }
-
-const baseFont = Platform.OS === 'ios' ? 'Georgia' : 'serif'
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
-  dropCapRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  leadParagraph: {
+    fontSize: 18,
+    fontWeight: "500",
+    lineHeight: 28,
+    color: "#333",
     marginBottom: 24,
+    fontFamily: Platform.OS === "ios" ? "System" : "sans-serif",
   },
-  dropCap: {
-    fontSize: 44,
-    fontWeight: '700',
-    fontFamily: baseFont,
-    color: '#B40000',
-    lineHeight: 50,
-    marginRight: 6,
-  },
-  firstParagraph: {
-    flex: 1,
-    fontSize: 16,
-    lineHeight: 26,
-    color: '#222',
-    fontFamily: baseFont,
+  divider: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginBottom: 24,
   },
   paragraph: {
-    fontSize: 16,
-    lineHeight: 26,
-    color: '#222',
-    fontFamily: baseFont,
-    marginBottom: 20,
-  },
-  imageWrap: {
-    marginVertical: 24,
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 14,
-  },
-  caption: {
-    textAlign: 'center',
-    fontStyle: 'italic',
-    fontSize: 13,
-    color: '#777',
-    marginTop: 8,
-  },
-  quoteBox: {
-    flexDirection: 'row',
-    backgroundColor: '#fff5f5',
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#B40000',
-    borderRadius: 10,
-    marginVertical: 20,
-    gap: 12,
-  },
-  quote: {
-    fontStyle: 'italic',
-    color: '#B40000',
-    fontSize: 15,
-    flex: 1,
-    lineHeight: 22,
-  },
-  keyPoints: {
-    backgroundColor: '#f9f9f9',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 32,
+    fontSize: 17,
+    lineHeight: 28,
+    color: "#333",
     marginBottom: 24,
+    fontFamily: Platform.OS === "ios" ? "System" : "sans-serif",
   },
-  keyPointsTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
+  truncatedContainer: {
+    marginTop: 8,
+    padding: 20,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 12,
+  },
+  truncatedHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  truncatedTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginLeft: 8,
+  },
+  truncatedText: {
+    fontSize: 15,
+    color: "#555",
+    lineHeight: 22,
     marginBottom: 16,
   },
-  keyPoint: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 14,
+  readMoreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: "#B40000",
+    borderRadius: 8,
+    alignSelf: "stretch",
   },
-  bullet: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#B40000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    marginTop: 2,
+  readMoreText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
   },
-  keyPointText: {
-    fontSize: 14,
-    color: '#333',
-    lineHeight: 20,
-    flex: 1,
-  },
-  authorBox: {
-    marginTop: 40,
-    flexDirection: 'row',
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#B40000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  avatarInitial: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  authorMeta: {
-    flex: 1,
-  },
-  authorName: {
-    fontWeight: '700',
-    fontSize: 16,
-    color: '#111',
-    marginBottom: 4,
-  },
-  authorRole: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+  readMoreIcon: {
+    marginLeft: 8,
   },
 })

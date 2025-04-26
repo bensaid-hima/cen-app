@@ -2,42 +2,13 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Switch, StatusBar, Platform } from "react-native"
 import { Feather } from "@expo/vector-icons"
-import { getSavedArticles, removeArticle } from "../storage/savedArticles"
 
 export default function ProfileScreen() {
-  const [savedCount, setSavedCount] = useState(0)
-  const [readMinutes, setReadMinutes] = useState(0)
   const [darkMode, setDarkMode] = useState(false)
   const [notifications, setNotifications] = useState(true)
-
-  useEffect(() => {
-    loadStats()
-  }, [])
-
-  const loadStats = async () => {
-    const saved = await getSavedArticles()
-    setSavedCount(saved.length)
-    const totalWords = saved.reduce((sum, a) => sum + (a.content?.length || 0), 0)
-    setReadMinutes(Math.round(totalWords / 1000))
-  }
-
-  const handleClearSaved = () => {
-    Alert.alert("Clear Saved Articles", "Are you sure you want to delete all saved articles?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Clear All",
-        style: "destructive",
-        onPress: async () => {
-          const saved = await getSavedArticles()
-          await Promise.all(saved.map((a) => removeArticle(a.url)))
-          loadStats()
-        },
-      },
-    ])
-  }
 
   const renderSectionHeader = (title: string) => (
     <View style={styles.sectionHeader}>
@@ -93,24 +64,6 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* Stats */}
-          <View style={styles.stats}>
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>{savedCount}</Text>
-              <Text style={styles.statLabel}>Saved</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>{readMinutes}</Text>
-              <Text style={styles.statLabel}>Min Read</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </View>
-          </View>
         </View>
 
         {/* Reading Preferences */}
@@ -164,7 +117,12 @@ export default function ProfileScreen() {
         {/* Danger Zone */}
         {renderSectionHeader("Danger Zone")}
         <View style={styles.settingsSection}>
-          {renderSettingRow("Clear Saved Articles", "trash-2", "#E74C3C", handleClearSaved)}
+          {renderSettingRow("Clear Saved Articles", "trash-2", "#E74C3C", () =>
+            Alert.alert("Clear Saved Articles", "Are you sure you want to delete all saved articles?", [
+              { text: "Cancel", style: "cancel" },
+              { text: "Clear All", style: "destructive", onPress: () => Alert.alert("Articles cleared") },
+            ]),
+          )}
           {renderSettingRow("Log Out", "log-out", "#E74C3C", () => Alert.alert("Log out of your account"))}
         </View>
 
@@ -218,7 +176,6 @@ const styles = StyleSheet.create({
   profileHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
   },
   avatarContainer: {
     position: "relative",
@@ -270,31 +227,6 @@ const styles = StyleSheet.create({
     color: "#555",
     fontSize: 13,
     fontWeight: "600",
-  },
-  stats: {
-    flexDirection: "row",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 12,
-    padding: 16,
-    justifyContent: "space-between",
-  },
-  statBox: {
-    alignItems: "center",
-    flex: 1,
-  },
-  statValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#111",
-  },
-  statLabel: {
-    fontSize: 13,
-    color: "#666",
-    marginTop: 4,
-  },
-  divider: {
-    width: 1,
-    backgroundColor: "#e0e0e0",
   },
   sectionHeader: {
     paddingHorizontal: 20,

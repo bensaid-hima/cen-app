@@ -1,4 +1,6 @@
-import React, { useState, useRef } from "react"
+"use client"
+
+import { useState, useRef } from "react"
 import { View, Animated, StyleSheet, StatusBar, Share } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import ArticleHeader from "../components/ArticleHeader"
@@ -7,28 +9,11 @@ import ArticleMeta from "../components/ArticleMeta"
 import ArticleContent from "../components/ArticleContent"
 import BottomStatBar from "../components/BottomStatBar"
 import CommentModal from "../components/CommentModal"
-import RelatedArticles from "../components/RelatedArticles"
 
 export default function ArticleDetailScreen({ route, navigation }: any) {
   const article = route.params?.article
   const [showComments, setShowComments] = useState(false)
   const scrollY = useRef(new Animated.Value(0)).current
-  // const [headerVisible, setHeaderVisible] = useState(true) // Removed headerVisible
-
-  // useEffect(() => { // Removed useEffect
-  //   const listener = scrollY.addListener(({ value }) => {
-  //     // Hide header when scrolling down, show when scrolling up
-  //     if (value > 60 && headerVisible) {
-  //       setHeaderVisible(false)
-  //     } else if (value <= 60 && !headerVisible) {
-  //       setHeaderVisible(true)
-  //     }
-  //   })
-
-  //   return () => {
-  //     scrollY.removeListener(listener)
-  //   }
-  // }, [headerVisible])
 
   if (!article) return null
 
@@ -75,9 +60,12 @@ export default function ArticleDetailScreen({ route, navigation }: any) {
             readingTime={readingTime}
             source={article.source?.name}
           />
-          <ArticleContent description={article.description} content={article.content} author={author} />
-
-          <RelatedArticles currentArticleUrl={article.url} />
+          <ArticleContent
+            description={article.description}
+            content={article.content}
+            author={author}
+            url={article.url}
+          />
         </Animated.ScrollView>
 
         <BottomStatBar article={article} onOpenComments={() => setShowComments(true)} onShare={handleShare} />

@@ -1,3 +1,5 @@
+"use client"
+
 import { View, Text, StyleSheet, ImageBackground, Dimensions, Animated, Platform } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { BlurView } from "expo-blur"
@@ -43,11 +45,11 @@ export default function HeroImage({ imageUrl, tag, scrollY }: HeroImageProps) {
         >
           <LinearGradient colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.6)"]} style={styles.gradient} />
 
-          <View style={styles.tagContainer}>
+          {/* <View style={styles.tagContainer}>
             <BlurView intensity={80} tint="dark" style={styles.blurView}>
               <Text style={styles.tagText}>{tag}</Text>
             </BlurView>
-          </View>
+          </View> */}
         </ImageBackground>
       </Animated.View>
     </View>

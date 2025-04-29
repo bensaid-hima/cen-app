@@ -91,8 +91,8 @@ export default function CategoryArticleList({ articles, loading }: Props) {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: 5,
   },
   loadingContainer: {
     padding: 20,
@@ -113,30 +113,28 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: "hidden",
-    marginBottom: 24,
+    marginBottom: 20,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 7,
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.03)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
   },
   image: {
     width: "100%",
-    height: 200,
+    height: 180,
   },
   imageStyle: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,
     height: "100%",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   imageContent: {
     flex: 1,
@@ -151,8 +149,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     justifyContent: "center",
     alignItems: "center",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   noImageText: {
     color: "#999",
@@ -186,10 +184,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "800",
+    fontSize: 16,
+    fontWeight: "700",
     color: "#111",
-    lineHeight: 24,
+    lineHeight: 22,
     marginBottom: 12,
     letterSpacing: -0.3,
   },
